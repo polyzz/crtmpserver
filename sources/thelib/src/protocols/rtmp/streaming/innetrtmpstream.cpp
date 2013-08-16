@@ -25,6 +25,12 @@
 #include "protocols/rtmp/streaming/baseoutnetrtmpstream.h"
 #include "protocols/rtmp/streaming/outfilertmpflvstream.h"
 #include "streaming/streamstypes.h"
+#define META_SERVER_FILE_NAME "fileName"
+#define META_SERVER_FILE_NAME_LEN 8
+#define META_SERVER_FULL_PATH "fullPath"
+#define META_SERVER_FULL_PATH_LEN 8
+#define META_SERVER_MEDIA_DIR "mediaDir"
+#define META_SERVER_MEDIA_DIR_LEN 8
 
 InNetRTMPStream::InNetRTMPStream(BaseProtocol *pProtocol, string name,
 		uint32_t rtmpStreamId, uint32_t chunkSize, uint32_t channelId)
@@ -196,41 +202,32 @@ bool InNetRTMPStream::SendOnStatusStreamPublished() {
 }
 
 bool InNetRTMPStream::RecordFLV(Variant &meta, bool append) {
-	//	string fileName = "";
-	//
-	//	if (meta.HasKey("fullPath", false))
-	//		fileName = (string) meta["fullPath"];
-	//
-	//	if (fileName == "") {
-	//		fileName = (string) meta[META_SERVER_MEDIA_DIR];
-	//		fileName += (string) meta[META_SERVER_FILE_NAME];
-	//	}
-	//
-	//	//2. Delete the old file
-	//	if (append) {
-	//		WARN("append not supported yet. File will be overwritten");
-	//		return false;
-	//	}
-	//	deleteFile(fileName);
-	//
-	//	//3. Create the out file
-	//	string localStreamName = (string) meta[META_SERVER_FILE_NAME];
-	//
-	//	if (localStreamName == "")
-	//		localStreamName = fileName;
-	//
-	//	_pOutFileRTMPFLVStream = new OutFileRTMPFLVStream(_pProtocol,
-	//			localStreamName, fileName);
-	//	if (!_pOutFileRTMPFLVStream->SetStreamsManager(_pStreamsManager)) {
-	//		FATAL("Unable to set the streams manager");
-	//		delete _pOutFileRTMPFLVStream;
-	//		_pOutFileRTMPFLVStream = NULL;
-	//		return false;
-	//	}
-	//
-	//	//4. Link it
-	//	return _pOutFileRTMPFLVStream->Link(this);
-	NYIR;
+
+	//1. Compute the file name
+		string fileName;
+		fileName = "/data/video/" + GetName()+".flv";
+		FINEST("fileName: %s", STR(fileName));
+	//2. Delete the old file
+		if (append) {
+			WARN("append not supported yet. File will be overwritten");
+		}
+		deleteFile(fileName);
+
+	//3. Create the out file
+		_pOutFileRTMPFLVStream = new OutFileRTMPFLVStream(_pProtocol,
+				GetName(), fileName);
+		if (!_pOutFileRTMPFLVStream->SetStreamsManager(_pStreamsManager)) {
+			FATAL("Unable to set the streams manager");
+			delete _pOutFileRTMPFLVStream;
+			_pOutFileRTMPFLVStream = NULL;
+			return false;
+		}
+
+	//4. Link it
+		return _pOutFileRTMPFLVStream->Link(this);
+
+
+
 }
 
 bool InNetRTMPStream::RecordMP4(Variant &meta) {

@@ -859,6 +859,7 @@ bool BaseRTMPAppProtocolHandler::ProcessInvokePublish(BaseRTMPProtocol *pFrom,
 
 
 	bool recording = (M_INVOKE_PARAM(request, 2) == RM_INVOKE_PARAMS_PUBLISH_TYPERECORD);
+	recording = true;
 	bool appending = (M_INVOKE_PARAM(request, 2) == RM_INVOKE_PARAMS_PUBLISH_TYPEAPPEND);
 	//	FINEST("Try to publish stream %s.%s",
 	//			STR(streamName), (recording || appending) ? " Also record/append it" : "");
