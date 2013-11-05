@@ -956,8 +956,23 @@ bool BaseRTMPAppProtocolHandler::ProcessInvokePublish(BaseRTMPProtocol *pFrom,
 			}
 		}
 	}
+        //10. Send Notification to http API
+        {
+          BaseProtocol *pHTTP = new InboundHTTPProtocol();
+          if (!pHTTP->Initialize(GetCustomParameters())) {
+            FATAL("Unable to create HTTP protocol");
+            pHTTP->EnqueueForDelete();
+            return false;
+          }
 
-	//10. Done
+          pHTTP->SetDisconnectAfterTransfer(true);
+          pHTTP->Method(HTTP_METHOD_GET);
+          pHTTP->Document("/api/help");
+          pHTTP->Host("paii.cn");
+          return pHTTP->EnqueueForOutbound();
+        }        
+
+	//11. Done
 	return true;
 }
 

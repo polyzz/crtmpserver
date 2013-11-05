@@ -25,6 +25,8 @@
 #include "protocols/rtmp/streaming/baseoutnetrtmpstream.h"
 #include "protocols/rtmp/streaming/outfilertmpflvstream.h"
 #include "streaming/streamstypes.h"
+#include "stdlib.h"
+
 #define META_SERVER_FILE_NAME "fileName"
 #define META_SERVER_FILE_NAME_LEN 8
 #define META_SERVER_FULL_PATH "fullPath"
@@ -205,13 +207,26 @@ bool InNetRTMPStream::RecordFLV(Variant &meta, bool append) {
 
 	//1. Compute the file name
 		string fileName;
+                string lastFileName;
+                int i = 0;
 		fileName = "/data/video/" + GetName()+".flv";
 		FINEST("fileName: %s", STR(fileName));
 	//2. Delete the old file
 		if (append) {
 			WARN("append not supported yet. File will be overwritten");
 		}
-		deleteFile(fileName);
+                
+                if(fileExists(fileName)) {
+                  do {
+                    lastFileName = format("/data/video/%s_%d.flv",STR(GetName()), i);
+                    i++;
+                  } while(fileExists(lastFileName));
+
+                  moveFile(fileName, lastFileName);
+                }
+
+
+		//deleteFile(fileName);
 
 	//3. Create the out file
 		_pOutFileRTMPFLVStream = new OutFileRTMPFLVStream(_pProtocol,
