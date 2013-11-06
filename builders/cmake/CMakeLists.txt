@@ -46,6 +46,7 @@ SET(CRYPTO_FIND_REQUIRED true)
 INCLUDE(cmake_find_modules/Find_openssl.cmake)
 INCLUDE(cmake_find_modules/Find_dl.cmake)
 INCLUDE(cmake_find_modules/pch_support.cmake)
+INCLUDE(cmake_find_modules/Find_curl.cmake)
 INCLUDE(CMakeDetermineSystem)
 INCLUDE(TestBigEndian)
 
