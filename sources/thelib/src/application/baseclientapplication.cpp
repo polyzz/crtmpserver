@@ -27,6 +27,7 @@
 #include "application/clientapplicationmanager.h"
 #include "streaming/streamstypes.h"
 #include "mediaformats/readers/streammetadataresolver.h"
+#include "curl/curl.h"
 
 uint32_t BaseClientApplication::_idGenerator = 0;
 
@@ -255,6 +256,62 @@ void BaseClientApplication::SignalStreamRegistered(BaseStream *pStream) {
 			(pStream->GetProtocol() != NULL) ? STR(tagToString(pStream->GetProtocol()->GetType())) : "",
 			(pStream->GetProtocol() != NULL) ? pStream->GetProtocol()->GetId() : (uint32_t) 0
 			);
+			
+	 //10. Send Notification to http API
+	if (TAG_KIND_OF(pStream->GetType(), ST_IN_NET_RTMP))
+	{
+		string streamName = pStream->GetName();
+		string posturl;
+		
+		std::vector<std::string> str_array;
+		std::istringstream f(streamName);
+		std::string s;
+		while(std::getline(f, s , '_') ) 
+		{
+			str_array.push_back(s);   
+		}
+		FINEST("registering app with name %s", STR(streamName));
+
+		if((str_array.size() == 2) && str_array[0]=="audio") {
+			posturl = "http://223.4.118.15:5460/api/audio.json?";
+			CURL* curl = curl_easy_init();
+			char* postdata = (char*) malloc(1000);
+
+			curl_easy_setopt(curl, CURLOPT_URL, STR(posturl));
+			curl_easy_setopt(curl, CURLOPT_NOPROGRESS, 1);
+			curl_easy_setopt(curl, CURLOPT_NOSIGNAL, 1);
+			curl_easy_setopt(curl, CURLOPT_TIMEOUT, 30);
+
+			sprintf(postdata, "token=%s", STR(str_array[1]));
+			curl_easy_setopt(curl, CURLOPT_POSTFIELDS, postdata);
+			CURLcode code = curl_easy_perform(curl);
+
+			long status;
+			curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &status);
+			FINEST("return code= %d , response code is %ld\n param string: \n %s",code, status,postdata);
+			free(postdata);
+		}
+		else if(str_array.size() == 5) {
+			CURL* curl = curl_easy_init();
+			char* postdata = (char*) malloc(1000);
+			posturl = "http://223.4.118.15:5460/api/live_rtmp.json?";
+			curl_easy_setopt(curl, CURLOPT_URL, STR(posturl));
+			curl_easy_setopt(curl, CURLOPT_NOPROGRESS, 1);
+			curl_easy_setopt(curl, CURLOPT_NOSIGNAL, 1);
+			curl_easy_setopt(curl, CURLOPT_TIMEOUT, 30);
+
+			sprintf(postdata, "token=%s&username=%s&size=%sx%s&encoding=flv/mp3/h263&bps=%s&server_url=%s&length=0&file_size=0", STR(str_array[0]), STR(str_array[1]), STR(str_array[2]), STR(str_array[3]), STR(str_array[4]), "rtmp://223.4.118.15:1939/videochat");
+
+			curl_easy_setopt(curl, CURLOPT_POSTFIELDS, postdata);
+			CURLcode code = curl_easy_perform(curl);
+			long status;
+			curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &status);
+			FINEST("return code= %d , response code is %ld\n param string: \n %s",code, status,postdata);
+			free(postdata);		   	
+		}
+		else
+			WARN("streamName error, as streamName = %s", STR(streamName));
+	}         
 }
 
 void BaseClientApplication::SignalStreamUnRegistered(BaseStream *pStream) {
@@ -266,6 +323,42 @@ void BaseClientApplication::SignalStreamUnRegistered(BaseStream *pStream) {
 			(pStream->GetProtocol() != NULL) ? STR(tagToString(pStream->GetProtocol()->GetType())) : "",
 			(pStream->GetProtocol() != NULL) ? pStream->GetProtocol()->GetId() : (uint32_t) 0
 			);
+	if (TAG_KIND_OF(pStream->GetType(), ST_IN_NET_RTMP))
+	{
+           string streamName = pStream->GetName();
+           std::vector<std::string> str_array;
+		   std::istringstream f(streamName);
+		   std::string s;
+		   
+		   while(std::getline(f, s , '_') ) 
+		   {
+		      str_array.push_back(s);   
+		   }
+
+		   if(str_array.size() != 5) {
+		   	INFO("do not care about stream other than video, stream name is %s", STR(streamName));
+		   	return;
+		   }
+
+		   
+           CURL* curl = curl_easy_init();
+		   char* postdata = (char*) malloc(1000);
+           curl_easy_setopt(curl, CURLOPT_URL, "http://223.4.118.15:5460/api/archived_rtmp.json?");
+           curl_easy_setopt(curl, CURLOPT_NOPROGRESS, 1);
+           curl_easy_setopt(curl, CURLOPT_NOSIGNAL, 1);
+           curl_easy_setopt(curl, CURLOPT_TIMEOUT, 30);
+
+
+		   
+           sprintf(postdata, "token=%s&username=%s&size=%sx%s&encoding=flv/mp3/h263&bps=%s&server_url=%s&length=0&file_size=0", STR(str_array[0]), STR(str_array[1]), STR(str_array[2]), STR(str_array[3]), STR(str_array[4]), "rtmp://223.4.118.15:1939/videochat");
+		   
+		   curl_easy_setopt(curl, CURLOPT_POSTFIELDS, postdata);
+           CURLcode code = curl_easy_perform(curl);
+		   long status;
+		   curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &status);
+           FINEST("return code= %d , response code is %ld\n param string: \n %s",code, status,postdata);
+		   free(postdata);
+    }        
 }
 
 bool BaseClientApplication::PullExternalStreams() {

@@ -34,6 +34,7 @@
 #include "streaming/baseinnetstream.h"
 #include "mediaformats/readers/streammetadataresolver.h"
 #include "curl/curl.h"
+#include <sstream>
 
 #define ONBWCHECK_SIZE 32767
 
@@ -957,37 +958,9 @@ bool BaseRTMPAppProtocolHandler::ProcessInvokePublish(BaseRTMPProtocol *pFrom,
 			}
 		}
 	}
-        //10. Send Notification to http API
-        {
-           CURL* curl = curl_easy_init();
+       
 
-           curl_easy_setopt(curl, CURLOPT_URL, "http://paii.cn/upload");
-
-           curl_easy_setopt(curl, CURLOPT_NOPROGRESS, 1);
-           curl_easy_setopt(curl, CURLOPT_NOSIGNAL, 1);
-           curl_easy_setopt(curl, CURLOPT_TIMEOUT, 30);
-           CURLcode code = curl_easy_perform(curl);
-           FINEST("return code is %d", code);
-           
-
-
-          /*
-          BaseProtocol *pHTTP = new InboundHTTPProtocol();
-          if (!pHTTP->Initialize(GetCustomParameters())) {
-            FATAL("Unable to create HTTP protocol");
-            pHTTP->EnqueueForDelete();
-            return false;
-          }
-
-          pHTTP->SetDisconnectAfterTransfer(true);
-          pHTTP->Method(HTTP_METHOD_GET);
-          pHTTP->Document("/api/help");
-          pHTTP->Host("paii.cn");
-          return pHTTP->EnqueueForOutbound();
-          */
-        }        
-
-	//11. Done
+	//10. Done
 	return true;
 }
 

@@ -84,7 +84,7 @@ configuration=
 			{
 				{
 					ip="0.0.0.0",
-					port=1935,
+					port=1939,
 					protocol="inboundRtmp"
 				},
 				{
@@ -107,12 +107,9 @@ configuration=
 			protocol="dynamiclinklibrary",
 			aliases=
 			{
-				"simpleLive",
-				"vod",
 				"live",
-				"WeeklyQuest",
-				"SOSample",
-				"oflaDemo",
+                                'live_gs7',
+                                'videochat',
 			},
 			acceptors = 
 			{

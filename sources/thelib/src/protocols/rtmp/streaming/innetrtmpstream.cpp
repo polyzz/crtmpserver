@@ -207,9 +207,9 @@ bool InNetRTMPStream::RecordFLV(Variant &meta, bool append) {
 
 	//1. Compute the file name
 		string fileName;
-                string lastFileName;
-                int i = 0;
-		fileName = "/data/video/" + GetName()+".flv";
+        string lastFileName;
+        int i = 0;
+		fileName = "/data/guoshou_app/web/public/video/" + GetName()+".flv";
 		FINEST("fileName: %s", STR(fileName));
 	//2. Delete the old file
 		if (append) {
@@ -218,7 +218,7 @@ bool InNetRTMPStream::RecordFLV(Variant &meta, bool append) {
                 
                 if(fileExists(fileName)) {
                   do {
-                    lastFileName = format("/data/video/%s_%d.flv",STR(GetName()), i);
+                    lastFileName = format("/data/guoshou_app/web/public/video/%s_%d.flv",STR(GetName()), i);
                     i++;
                   } while(fileExists(lastFileName));
 

@@ -39,11 +39,11 @@ BaseProtocol::BaseProtocol(uint64_t type) {
 	_enqueueForDelete = false;
 	_gracefullyEnqueueForDelete = false;
 	_pApplication = NULL;
-#ifdef LOG_CONSTRUCTOR_DESTRUCTOR
+//#ifdef LOG_CONSTRUCTOR_DESTRUCTOR
 	FINEST("Protocol with id %"PRIu32" of type %s created; F: %p,N: %p, DF: %d, DN: %d",
 			_id, STR(tagToString(_type)),
 			_pFarProtocol, _pNearProtocol, _deleteFar, _deleteNear);
-#endif
+//#endif
 	ProtocolManager::RegisterProtocol(this);
 	GETCLOCKS(_creationTimestamp, double);
 	_creationTimestamp /= (double) CLOCKS_PER_SECOND;
