@@ -136,39 +136,8 @@ configuration=
 					protocol="inboundRtsp"
 				},]]--
 			},
-			externalStreams = 
-			{
-				--[[
-				{
-					uri="rtsp://fms20.mediadirect.ro/live2/realitatea/realitatea",
-					localStreamName="rtsp_test",
-					forceTcp=true
-				},
-				{
-					uri="rtmp://edge01.fms.dutchview.nl/botr/bunny",
-					localStreamName="rtmp_test",
-					swfUrl="http://www.example.com/example.swf",
-					pageUrl="http://www.example.com/",
-					tcUrl="rtmp://edge01.fms.dutchview.nl/botr/bunny", --this one is usually required and should have the same value as the uri
-					emulateUserAgent="MAC 10,1,82,76",
-				}]]--
-				{
-                        uri="rtsp://animalhousenc.dvrdns.org:554/streaming/channels/0",
-                        localStreamName="PoolSide",
-                        forceTcp=true
-                },
-                {
-                        uri="rtsp://animalhousenc.dvrdns.org:556/streaming/channels/0",
-                        localStreamName="BoneYard",
-                        forceTcp=true
-                },
-                {
-                        uri="rtsp://animalhousenc.dvrdns.org:557/streaming/channels/0",
-                        localStreamName="BigPool",
-                        forceTcp=true
-                },
-			},
 			validateHandshake=false,
+                        SaveLiveUrl="http://weishanke.com:5460/api/save_live",
 			--enableCheckBandwidth=true,
 			--[[authentication=
 			{
