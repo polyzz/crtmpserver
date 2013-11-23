@@ -272,6 +272,7 @@ void BaseClientApplication::SignalStreamRegistered(BaseStream *pStream) {
 		}
 		FINEST("registering app with name %s", STR(streamName));
 
+
 		if((str_array.size() == 2) && str_array[0]=="audio") {
 			posturl = "http://223.4.118.15:5460/api/audio.json?";
 			CURL* curl = curl_easy_init();
@@ -294,6 +295,8 @@ void BaseClientApplication::SignalStreamRegistered(BaseStream *pStream) {
 		else if(str_array.size() == 5) {
 			CURL* curl = curl_easy_init();
 			char* postdata = (char*) malloc(1000);
+			CURLcode code;
+			long status;
 			posturl = "http://223.4.118.15:5460/api/live_rtmp.json?";
 			curl_easy_setopt(curl, CURLOPT_URL, STR(posturl));
 			curl_easy_setopt(curl, CURLOPT_NOPROGRESS, 1);
@@ -303,10 +306,25 @@ void BaseClientApplication::SignalStreamRegistered(BaseStream *pStream) {
 			sprintf(postdata, "token=%s&username=%s&size=%sx%s&encoding=flv/mp3/h263&bps=%s&server_url=%s&length=0&file_size=0", STR(str_array[0]), STR(str_array[1]), STR(str_array[2]), STR(str_array[3]), STR(str_array[4]), "rtmp://223.4.118.15:1939/videochat");
 
 			curl_easy_setopt(curl, CURLOPT_POSTFIELDS, postdata);
-			CURLcode code = curl_easy_perform(curl);
-			long status;
+			code = curl_easy_perform(curl);
+		
 			curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &status);
 			FINEST("return code= %d , response code is %ld\n param string: \n %s",code, status,postdata);
+
+			//create snapshot image
+			posturl = "http://127.0.0.1:3000/api/snapshot.json";
+			curl_easy_setopt(curl, CURLOPT_URL, STR(posturl));
+			curl_easy_setopt(curl, CURLOPT_NOPROGRESS, 1);
+			curl_easy_setopt(curl, CURLOPT_NOSIGNAL, 1);
+			curl_easy_setopt(curl, CURLOPT_TIMEOUT, 30);
+
+			sprintf(postdata, "streamname = %s", STR(streamName));
+
+			curl_easy_setopt(curl, CURLOPT_POSTFIELDS, postdata);
+			code = curl_easy_perform(curl);
+			curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &status);
+			FINEST("return code= %d , response code is %ld\n param string: \n %s",code, status,postdata);
+
 			free(postdata);		   	
 		}
 		else
